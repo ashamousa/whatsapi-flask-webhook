@@ -4,20 +4,11 @@ import json
 from heyoo import WhatsApp
 from os import environ
 from flask import Flask, request, make_response
-
+import requests
 
 messenger = WhatsApp(environ.get("TOKEN"), phone_number_id=environ.get("PHONE_NUMBER_ID")) #this should be writen as 
-#WhatsApp(token = "inpust accesstoken", phone_number_id="input phone number id") #messages are not recieved without this pattern
 
-
-# Here's an article on how to get the application secret from Facebook developers portal.
-# https://support.appmachine.com/support/solutions/articles/80000978442
 VERIFY_TOKEN = environ.get("APP_SECRET") #application secret here
-
-#to be tested in prod environment
-# messenger = WhatsApp(os.getenv("heroku whatsapp token"),phone_number_id='105582068896304')
-# VERIFY_TOKEN = "heroku whatsapp token"
-
 
 # Logging
 logging.basicConfig(
@@ -52,7 +43,7 @@ def hook():
     if changed_field == "messages":
         new_message = messenger.get_mobile(data)
         if new_message:
-            mobile = messenger.get_mobile(data)
+            mobile = messenger.get_mobile(data).strip().strip('+').replace(' ', '')
             name = messenger.get_name(data)
             message_type = messenger.get_message_type(data)
             logging.info(
@@ -62,8 +53,36 @@ def hook():
                 message = messenger.get_message(data)
                 name = messenger.get_name(data)
                 logging.info("Message: %s", message)
-                messenger.send_message(f"Hi {name}, nice to connect with you", mobile)
+                requests.
+                #messenger.send_message(f"Hi {name}, nice to connect with you", mobile)
+                if '/to ' in message:
+                    sms_id=message.split('/to ')[1].strip().strip('+').replace(' ', '')
+                    x={'sms_id':sms_id, 'wts_name':name, 'wts_id':mobile}
+                    requests.post('https://41.33.200.226:8001/set_db',json=x)
+                else:
+                    x={'frm':mobile, 'name':name, 'mssg':message}
+                    requests.post('https://41.33.200.226:8001/send_wts',json=x)
 
+            else:
+                print(f"{mobile} sent {message_type} ")
+                print(data)
+        else:
+            delivery = messenger.get_delivery(data)
+            if delivery:
+                print(f"Message : {delivery}")
+            else:
+                print("No new message")
+    return "ok"
+
+
+if __name__ == '__main__': 
+    app.run(debug=True)
+
+
+
+
+
+'''
             elif message_type == "interactive":
                 message_response = messenger.get_interactive_response(data)
                 intractive_type = message_response.get("type")
@@ -108,17 +127,6 @@ def hook():
                 file_filename = messenger.download_media(file_url, mime_type)
                 print(f"{mobile} sent file {file_filename}")
                 logging.info(f"{mobile} sent file {file_filename}")
-            else:
-                print(f"{mobile} sent {message_type} ")
-                print(data)
-        else:
-            delivery = messenger.get_delivery(data)
-            if delivery:
-                print(f"Message : {delivery}")
-            else:
-                print("No new message")
-    return "ok"
 
 
-if __name__ == '__main__': 
-    app.run(debug=True)
+'''
