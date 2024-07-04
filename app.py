@@ -58,10 +58,10 @@ def hook():
                 if '/to ' in message:
                     sms_id=message.split('/to ')[1].strip().strip('+').replace(' ', '')
                     x={'sms_id':sms_id, 'wts_name':name, 'wts_id':mobile}
-                    requests.post('https://41.33.200.226:8001/set_db',json=x)
+                    requests.post('http://41.33.200.226:8001/set_db',json=x)
                 else:
                     x={'frm':mobile, 'name':name, 'mssg':message}
-                    requests.post('https://41.33.200.226:8001/send_wts',json=x)
+                    requests.post('http://41.33.200.226:8001/send_wts',json=x)
 
             else:
                 print(f"{mobile} sent {message_type} ")
