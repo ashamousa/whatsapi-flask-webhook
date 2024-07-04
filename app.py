@@ -53,7 +53,7 @@ def hook():
                 message = messenger.get_message(data)
                 name = messenger.get_name(data)
                 logging.info("Message: %s", message)
-                requests.
+                
                 #messenger.send_message(f"Hi {name}, nice to connect with you", mobile)
                 if '/to ' in message:
                     sms_id=message.split('/to ')[1].strip().strip('+').replace(' ', '')
