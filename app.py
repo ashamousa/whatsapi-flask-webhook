@@ -54,11 +54,13 @@ def hook():
                 name = messenger.get_name(data)
                 logging.info("Message: %s", message)
                 
-                #messenger.send_message(f"Hi {name}, nice to connect with you", mobile)
+                #
                 if '/to ' in message:
                     sms_id=message.split('/to ')[1].strip().strip('+').replace(' ', '')
                     x={'sms_id':sms_id, 'wts_name':name, 'wts_id':mobile}
-                    requests.post('http://41.33.200.226:8001/set_db',json=x)
+                    resp=requests.post('http://41.33.200.226:8001/set_db',json=x)
+                    if resp.text=='ok':
+                        messenger.send_message("You are in a conversation with "+mobile, mobile)
                 else:
                     x={'frm':mobile, 'name':name, 'mssg':message}
                     requests.post('http://41.33.200.226:8001/send_wts',json=x)
